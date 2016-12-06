@@ -1,0 +1,799 @@
+' Gambas class file
+
+    Public strVersion As String                                           ' Programm Version
+    Public strImageMagickVer As String                                    ' Version von ImageMagick
+    Public strImageMagickVerShort As String                               ' Kurz-Version von ImageMagick
+
+    Public strSelectedPaths As String[]                                   ' multiPfade zu Dateien inkl. vollständiger Dateiname (Array)
+    Public strSelectedPath As String                                      ' Pfad zur Datei inkl. vollständiger Dateiname
+    Public strSelectedLeseDir As String                                   ' Pfad des Verzeichnis
+    Public strSelectedDateiOhneExt As String                              ' Pfad zur Datei inkl. Dateiname ohne Endung
+    Public strSelectedDateiExt As String                                  ' Dateiname-Endung
+    Public strSelectedDatei As String                                     ' Dateiname
+    Public strSmall As String                                             ' Dateianhang für kleine Bilder
+    Public intResize As Integer                                           ' max. Bildgrösse kleine Bilder in Pixel
+    Public intQuality As Integer                                          ' Quality kleine Bilder in %
+    Public intFrame As Integer                                            ' Rahmengöße in Pixel
+    Public intDateiGroesse As Integer                                     ' Dateigröße in bytes
+    Public bolJPGFormat As Boolean                                        ' Bild nach JPG umwandeln
+    Public bolExif As Boolean                                             ' alle Exif-Infos aus dem Bild entfernen (mogrify -strip bild.jpg)
+    Public bolDblClick As Boolean                                         ' Bild verkleinern mit Doppelklick
+    Public bolDisplayHelp As Boolean                                      ' Display Hilfe ImageMagick anzeigen
+
+    Private strCommand As String                                          ' gksudo Befehl um evt. Tools zu installieren
+
+    'STATIC PRIVATE ......
+    '.............Ende der Public-Deklaration..........................................................
+
+Public Sub Form_Close()
+' Settings speichern
+Settings["Bild/DateianhangKlein"] = strSmall
+Settings["Bild/Resize"] = intResize
+Settings["Bild/Quality"] = intQuality
+Settings["Bild/Frame"] = intFrame
+Settings["Bild/JPGFormat"] = bolJPGFormat
+Settings["Bild/Exif"] = bolExif
+Settings["Einstellung/DblClick"] = bolDblClick
+Settings["Einstellung/SelectedLeseDir"] = strSelectedLeseDir
+Settings["Einstellung/DisplayHelp"] = bolDisplayHelp
+Settings.Save
+
+End
+
+Public Sub Form_Open()
+Dim i As Integer
+ ' aus dem ImageMagick - Paket
+ ' convert > speichert die Änderung in ein neues Bild
+ ' mogrify > überschreibt das Originalbild
+ ' identify > exif-Info
+ ' logo+ausgabe eignet sich gut zum testen, z.B.: convert logo: -resize 400x x:
+
+
+    ' Prüfe ob ImageMagick installiert ist
+    Try Shell "convert -version" Wait To strImageMagickVer
+    If strImageMagickVer = "" Then
+      Message.Warning(("Fehler ImageMagick!" & Chr(10) & "ImageMagick und libjpeg-progs muß installiert sein damit das Programm funktioniert!") & Chr(10) &
+      ("z.B. per Terminal:") & Chr(10) & "sudo apt-get install imagemagick libjpeg-progs" & Chr(10) & Chr(10) &
+      "Versuche diese Tools nun automatisch zu installieren." & Chr(10) &
+      "Dafür wird eine Internetverbindung und das Root-Passwort benötigt!", (" OK "))
+
+      'Clipboard.Copy("sudo apt-get install imagemagick libjpeg-progs")
+      'TRY SHELL ("gnome-terminal")
+        strCommand = "apt-get install imagemagick libjpeg-progs"
+        Try Shell "gksudo " & strCommand Wait    ' wenn GNOME
+        Try Shell "kdesudo " & strCommand Wait   ' wenn KDE
+    Endif
+
+ ' Versionen
+    strImageMagickVerShort = Left(strImageMagickVer, 39)
+    strVersion = Application.Version
+
+ ' Info
+lblVersion.Text = "Version: kleinBild3 " & strVersion & Chr(10) & Chr(10) & strImageMagickVerShort
+lblInfo.Text = "Kleines GUI um Bilder mit dem Command Line Tool 'ImageMagick' schnell und einfach mit nur einem Klick" &
+Chr(10) & "zu verkleinern und verlustfrei zu drehen (das Original und die exif-Daten bleiben dabei erhalten)." &
+Chr(10) & "Die Bildgröße wird nur geändert wenn die gewünschte Zielgröße tatsächlich kleiner ist." &
+Chr(10) & "Da der I.E. keine CMYK-Bilder anzeigen kann, werden diese nach RGB umgewandelt!" &
+Chr(10) & Chr(10) & "Mit kleinBild3 können exif-Daten entfernt werden und PDF-Dateien in Bilder umgewandelt werden (u.v.m)." &
+Chr(10) & "Bilder mit exif-Daten werden automatisch orientiert (automatische Drehung) und gespeichert." &
+Chr(10) & Chr(10) & "Falls 'ImageMagick' und 'libjpeg-progs' nicht installiert sind, einfach per Terminal (Konsole) installieren." &
+Chr(10) & "Befehl: sudo apt-get install imagemagick libjpeg-progs" & Chr(10) & Chr(10) &
+"Das Programm ist Freeware. Die Installation und Gebrauch geschieht auf eigene Gefahr!" &
+Chr(10) & Chr(10) & Chr(10) & "Aktuelle Updates gibt es auf meiner Homepage."
+
+
+ ' ini
+  Me.Center
+  strSelectedLeseDir = Settings["Einstellung/SelectedLeseDir", User.Home]
+  strSmall = Settings["Bild/DateianhangKlein", "_klein"]
+  intResize = Settings["Bild/Resize", 600]
+  intQuality = Settings["Bild/Quality", 75]
+  intFrame = Settings["Bild/Frame", 0]
+
+  bolDblClick = Settings["Einstellung/DblClick", False]
+  cbxDbkClick.Value = bolDblClick ' checkBox
+
+  bolDisplayHelp = Settings["Einstellung/DisplayHelp", True]
+  cbxDisplayHelp.Value = bolDisplayHelp
+
+  bolExif = Settings["Bild/Exif", False]
+  cbxExif.Value = bolExif
+
+  bolJPGFormat = Settings["Bild/JPGFormat", False]
+  If bolJPGFormat = False Then
+  radPicFormat0.Value = True ' radioButton Bildformat bleibt
+  Else
+  radPicFormat1.Value = True ' radioButton Bild wird zu JPG
+  Endif
+
+  txtSmall.text = strSmall ' Dateianhang für kleine Bilder
+  TabStrip1_Click() ' TAB Infotexte
+
+
+ ' Combobox cbxPicResize füllen
+    cbxPicResize.Add(0)
+
+    For i = 16 To 240 Step 16
+    cbxPicResize.Add(i)
+    Next
+    For i = 256 To 960 Step 64
+    cbxPicResize.Add(i)
+    Next
+    For i = 1024 To 1920 Step 128
+    cbxPicResize.Add(i)
+    Next
+    For i = 2048 To 4096 Step 256
+    cbxPicResize.Add(i)
+    Next
+    cbxPicResize.Text = intResize
+
+
+ ' Combobox cbxPicQuality füllen
+  For i = 20 To 90 Step 5
+  cbxPicQuality.Add(i)
+  Next
+  For i = 91 To 100 Step 1
+  cbxPicQuality.Add(i)
+  Next
+  cbxPicQuality.Text = intQuality
+
+   ' Combobox cbxFrame füllen
+  For i = 0 To 100 Step 5
+  cbxFrame.Add(i)
+  Next
+  cbxFrame.Text = intFrame
+
+
+ ' Dateimanager
+FileChooser1.Dir = strSelectedLeseDir
+FileChooser1.Filter = ["*.jpg;*.jpeg;*.pdf", "JPG & PDF files", "*.jpg;*.jpeg;*.png;*.gif;*.bmp", "Picture files", "*.jpg;*.jpeg", "JPG files", "*.pdf", "PDF files", "*.png", "PNG files", "*.gif", "GIF files", "*.bmp", "BMP files"]
+FileChooser1.ShowBookmark = False
+FileChooser1.Multi = True
+FileChooser1.ShowDetailed = True
+
+End
+
+
+Public Sub btnEnd_Click()
+Me.Close
+End
+
+Public Sub Form_KeyPress()
+
+  Select Case Key.Code
+     Case Key.Escape
+     Me.Close ' Beenden
+     ' Key.Delete funzt leider nur wenn die Form SetFocus ist, aber dann funzt der Cursor hoch+runter im FileChooser1 nicht mehr ;-(
+     Case Key.F4 And TabStrip1.Index = 0 And btnDeleteFile.Enabled = True
+     btnDeleteFile_Click() ' Delete File
+  End Select
+
+End
+
+
+Public Sub btnDeleteFile_Click()
+Dim intIndex As Integer
+Dim intDateien As Integer                        ' Anzahl der markierten Dateien (multiPfade)
+
+  strSelectedPaths = FileChooser1.SelectedPaths  ' multiPfade + vollständiger Dateiname
+
+  ' Funktionslogik pro Datei
+  For intDateien = 0 To strSelectedPaths.Length - 1
+     ' nur den Dateinamen:
+     ' strSelectedPath = Mid$(strSelectedPaths[intDateien], RInStr(strSelectedPaths[intDateien], "/") + 1)
+     ' kompletten Pfad mit Dateinamen:
+       strSelectedPath = strSelectedPaths[intDateien]
+
+
+
+  ' Einzeldateiname aus Einlese-Pfad extrahiert
+  strSelectedDatei = Mid$(strSelectedPath, RInStr(strSelectedPath, "/") + 1)
+
+  If intDateiGroesse = 0 Then Return
+  intIndex = Message.Delete(" WARNUNG! " & CInt(strSelectedPaths.Length - intDateien) & " Datei(en) löschen?" & Chr(10) & Chr(10) & " '" & strSelectedDatei & "'" & " unwiderruflich löschen?", "Ja", "Nein")
+
+  If intIndex = 1 Then
+   Try Kill strSelectedPath
+
+     ' FileChooser1.Refresh  -> funktioniert nicht da dieses für GUI und Reload nicht gibt.
+     ' darum:
+   Try FileChooser1.ShowDetailed = False
+   Try FileChooser1.ShowDetailed = True
+
+  Endif
+
+  Next ' intDateien
+
+
+     intDateiGroesse = 0 ' damit die Schalter deaktiviert werden (it's a trick ;-)
+     Active_Deactive()   ' Schalter aktivieren/deaktivieren
+
+End
+
+
+Public Sub FileChooser1_Change()
+Dim intDateien As Integer             ' Anzahl der markierten Dateien (multiPfade)
+Dim strVorschauShell As String        ' Shellbefehlsstring zum Erzeugen des Vorschaubildes
+Dim strPicInfo As String              ' Shellbefehlsstring für Bilderinfo
+Dim picVorschaubild As Picture        ' erzeugtes Vorschaubild
+Dim strGeometryShell, strGeometry As String       ' Shellbefehlsstring, Geometry (Pixel Daten)
+Dim strPicExif, strFormat As String               ' exif-Daten, exif-Format
+
+Inc Application.Busy
+
+strSelectedPaths = FileChooser1.SelectedPaths  ' multiPfade + vollständiger Dateiname
+
+  ' Funktionslogik pro Datei
+  For intDateien = 0 To strSelectedPaths.Length - 1
+     ' nur den Dateinamen:
+     ' strSelectedPath = Mid$(strSelectedPaths[intDateien], RInStr(strSelectedPaths[intDateien], "/") + 1)
+     ' kompletten Pfad mit Dateinamen:
+       strSelectedPath = strSelectedPaths[intDateien]
+  Next
+
+
+
+ ' Dateigröße
+      Try intDateiGroesse = Round(Stat(strSelectedPath).Size / 1.024) ' Label Dateigröße
+
+ ' Label Ordner + Dateiname
+      If Len(strSelectedPath) > 45 Then
+         lblDateiOrt.Text = "..." & Right$(strSelectedPath, 45)
+      Else
+         lblDateiOrt.Text = strSelectedPath
+      Endif
+
+   If intDateiGroesse <= 1000
+    lblDateiGroesse.Text = "Größe: " & intDateiGroesse & " Bytes"
+   Else If intDateiGroesse > 1000 And intDateiGroesse <= 1000000
+    lblDateiGroesse.Text = "Größe: " & Format$(intDateiGroesse / 1000, "#.##") & " kBytes"
+   Else If intDateiGroesse > 1000000
+    lblDateiGroesse.Text = "Größe: " & Format$(intDateiGroesse / 1000000, "#.##") & " MBytes"
+   Endif
+
+
+
+' Schalter aktivieren/deaktivieren und Vorschaubild erstellen
+If intDateiGroesse = 0 Then ' wenn keine Datei markiert ist
+ '
+Else ' oder wenn eine Datei markiert ist
+  Active_Deactive() ' Schalter aktivieren/deaktivieren
+' Pfad merken
+  strSelectedLeseDir = Left$(strSelectedPath, RInStr(strSelectedPath, "/") - 1)
+  Settings["Einstellung/SelectedLeseDir"] = strSelectedLeseDir
+' Vorschaubild zeigt ein Bild entsprechend der EXIF Orientation richtig an
+   strVorschauShell = "convert -auto-orient -thumbnail x75 '" & strSelectedPath & "' /tmp/kleinBild-thumbnail.png"
+    Try Shell strVorschauShell Wait
+     Try picVorschaubild = Picture.Load("/tmp/kleinBild-thumbnail.png")
+      picVorschauBox.Picture = picVorschaubild ' kein try notwendig
+       Try Shell "rm /tmp/kleinBild-thumbnail.png" Wait   'Bild wieder löschen im /tmp-Verzeichnis
+        picVorschauBox.Refresh()
+Endif
+
+
+ ' Text für den btnChangePicAll Schalter
+ If Len(strSelectedLeseDir) > 50 Then
+   btnChangePicAll.text = "&Alle JPG im Ordner '..." & Right$(strSelectedLeseDir, 50) & "' verkleinern"
+ Else
+   btnChangePicAll.text = "&Alle JPG im Ordner '" & strSelectedLeseDir & "' verkleinern"
+ Endif
+
+
+  ' ImageMagick: identify -> exif Daten wenn vorhanden
+  strFormat = "Seite(n): %n, Pixel: %wx%h\n"
+  If intDateiGroesse > 0 Then Try Shell "identify -format '" & strFormat & "' '" & strSelectedPath & "'" Wait To strPicExif
+  lblPixel.Text = strPicExif ' Label muss TopRight sein!
+
+
+ If intDateien = 0 Then intDateiGroesse = 0 ' keine Datei ist markiert, also ist die Dateigröße 0
+
+ Active_Deactive() ' Schalter aktivieren/deaktivieren
+
+ Settings["Einstellung/SelectedLeseDir"] = strSelectedLeseDir
+
+Dec Application.Busy
+End
+
+
+Public Sub Active_Deactive() ' Schalter aktivieren/deaktivieren
+strSelectedDateiExt = LCase$(Mid$(strSelectedPath, RInStr(strSelectedPath, ".") + 1)) ' Datei Endung
+
+If intDateiGroesse = 0 Then ' wenn Dateigröße = 0 dann ist auch kein File markiert
+  btnDeleteFile.Enabled = False
+  btnChangePic.Enabled = False
+  picVorschauBox.Visible = False
+  btnRotateLeft.Visible = False
+  btnRotateRight.Visible = False
+  btnChangePicAll.Enabled = False
+  lblDateiGroesse.Visible = False
+  lblDateiOrt.Visible = False
+  lblPixel.Visible = False
+  btnPicInfo.Visible = False
+
+Else ' wenn Dateigröße > 0
+
+  btnDeleteFile.Enabled = True
+  btnChangePic.Enabled = True
+  picVorschauBox.Visible = True
+     If strSelectedDateiExt = "jpg" Or strSelectedDateiExt = "jpeg" Then
+     btnRotateLeft.Visible = True
+     btnRotateRight.Visible = True
+         Else
+     btnRotateLeft.Visible = False
+     btnRotateRight.Visible = False
+     Endif
+  btnChangePicAll.Enabled = True
+  lblDateiGroesse.Visible = True
+  lblDateiOrt.Visible = True
+  lblPixel.Visible = True
+     If Len(lblPixel.Text) > 1 Then
+     btnPicInfo.Visible = True
+         Else
+     btnPicInfo.Visible = False
+     Endif
+Endif
+
+End
+
+
+
+
+Public Sub btnChangePic_Click()
+Dim intDateien As Integer                         ' Anzahl der markierten Dateien (multiPfade)
+Dim strPIConvertShell As String                   ' Shellbefehlsstring
+
+Inc Application.Busy
+strSelectedPaths = FileChooser1.SelectedPaths     ' multiPfade + vollständiger Dateiname
+
+
+  ' Funktionslogik pro Datei
+       For intDateien = 0 To strSelectedPaths.Length - 1
+     ' nur den Dateinamen:
+     ' strSelectedPath = Mid$(strSelectedPaths[intDateien], RInStr(strSelectedPaths[intDateien], "/") + 1)
+     ' kompletten Pfad mit Dateinamen:
+       strSelectedPath = strSelectedPaths[intDateien]
+
+
+    strSelectedDateiOhneExt = Left$(strSelectedPath, RInStr(strSelectedPath, ".") - 1)      ' Pfad + Dateiname ohne Endung
+    strSelectedDateiExt = LCase$(Mid$(strSelectedPath, RInStr(strSelectedPath, ".") + 1))   ' Endung, Großtext in Kleintext (LCase)
+
+
+' --------------- Umwandeln Start --------------------
+
+
+
+If intResize = 0 Then ' Bildgröße bleibt (also kein -resize)
+
+
+If strSelectedDateiExt = "pdf" Then
+   ' PDF in Bild umwandeln, Auflösung Standard 72dpi (das ist zu wenig, darum 200)
+    strPIConvertShell = "convert -set colorspace sRGB -auto-orient -density 200 -quality " & intQuality & " '" & strSelectedPath & "' '" & strSelectedDateiOhneExt & strSmall & ".jpg'"
+Else
+   ' Bild umwandeln
+    If cbxPDF.Value = True Then
+      strSelectedDateiExt = "pdf"
+    Else
+       ' wenn bolJPGFormat=True dann immer JPG!
+         If bolJPGFormat = True Then strSelectedDateiExt = "jpg"
+    Endif
+
+    strPIConvertShell = "convert -set colorspace sRGB -auto-orient -quality " & intQuality & " -raise " & intFrame & "x" & intFrame & " '" & strSelectedPath & "' '" & strSelectedDateiOhneExt & strSmall & "." & strSelectedDateiExt & "'"
+Endif
+
+
+   Else ' Bildgröße verändern (-resize)
+
+
+If strSelectedDateiExt = "pdf" Then
+   ' PDF in Bild umwandeln, Auflösung Standard 72dpi (das ist zu wenig, darum 200)
+   ' Bild umwandeln
+    strPIConvertShell = "convert -set colorspace sRGB -auto-orient -density 200 -resize " & intResize & "x" & intResize & " " & "-quality " & intQuality & " '" & strSelectedPath & "' '" & strSelectedDateiOhneExt & strSmall & ".jpg'"
+Else
+   ' Bild umwandeln
+    If cbxPDF.Value = True Then ' einmalig als PDF
+      strSelectedDateiExt = "pdf"
+    Else
+       ' wenn bolJPGFormat=True dann immer JPG!
+         If bolJPGFormat = True Then strSelectedDateiExt = "jpg"
+    Endif
+
+    strPIConvertShell = "convert -set colorspace sRGB -auto-orient -resize " & intResize & "x" & intResize & "'>' -raise " & intFrame & "x" & intFrame & " " & "-quality " & intQuality & " '" & strSelectedPath & "' '" & strSelectedDateiOhneExt & strSmall & "." & strSelectedDateiExt & "'"
+Endif
+
+
+Endif ' End intResize
+
+ Try Shell strPIConvertShell Wait
+
+
+ ' alle Exif-Infos aus dem neuen Bild entfernen
+ If bolExif = True Then
+   strPIConvertShell = "mogrify -strip " & "'" & strSelectedDateiOhneExt & strSmall & "." & strSelectedDateiExt & "'"
+   Try Shell strPIConvertShell Wait
+ Endif
+
+
+             Next ' intDateien
+
+
+
+' --------------- Umwandeln Ende --------------------
+
+ cbxPDF.Value = False
+
+     FileChooser1.Reload
+     intDateiGroesse = 0 ' damit die Schalter deaktiviert werden (it's a trick ;-)
+     Active_Deactive()   ' Schalter aktivieren/deaktivieren
+
+'das funzt seit Gambas 3.5 nicht mehr!
+' aktuelle Datei markieren (funzt in Multimode nicht)
+'FileChooser1.Multi = False
+'FileChooser1.SelectedPath = strSelectedPath
+'FileChooser1.Multi = True
+
+Dec Application.Busy
+
+End
+
+
+
+' Pixelgrösse --------------------
+Public Sub cbxPicResize_Click()
+    If cbxPicResize.Text = "" Then
+       intResize = 0
+       Else
+       intResize = CInt(cbxPicResize.Text)
+    Endif
+End
+
+Public Sub cbxPicResize_Change()
+cbxPicResize_Click()
+End
+
+Public Sub cbxPicResize_KeyPress()
+' nur Zahlen
+If key.Code >= 48 And key.Code <= 57 Then
+Else If key.Code = key.BackSpace Then
+Else If key.Code = key.Delete Then
+Else If key.Code = key.Tab Then
+Else If key.Code = key.Left Then
+Else If key.Code = key.Right Then
+Else
+Stop Event
+Endif
+End
+
+
+' Bildqualität --------------------
+Public Sub cbxPicQuality_Click()
+intQuality = cbxPicQuality.Text
+End
+
+' Rahmen --------------------
+Public Sub cbxFrame_Click()
+intFrame = cbxFrame.Text
+End
+
+' Textanhang --------------------
+Public Sub txtSmall_Change()
+strSmall = txtSmall.Text
+If Len(strSmall) < 1 Then
+strSmall = "_klein"
+txtSmall.Text = strSmall
+Endif
+End
+
+
+
+
+Public Sub FileChooser1_Activate()
+' dblClick Mouse
+If cbxDbkClick.Value = True Then btnChangePic_Click()
+End
+
+
+Public Sub cbxDbkClick_Click() ' Doppelklick aktivieren
+bolDblClick = cbxDbkClick.Value
+End
+
+Public Sub cbxDisplayHelp_Click() ' Display Hilfe ImageMagick anzeigen
+bolDisplayHelp = cbxDisplayHelp.Value
+End
+
+Public Sub cbxExif_Click() ' alle Exif-Infos werden aus dem Bild entfernen
+bolExif = cbxExif.Value
+End
+
+
+Public Sub picVorschauBox_MouseDown()       ' Bild groß öffnen
+Dim strDisplayShell As String               ' Shellbefehlsstring
+Dim strPicExifW, strPicExifH As String      ' Pixelgröße als String
+Dim intPicExifW, intPicExifH As Integer     ' Pixelgröße als Integer
+Dim intDateien As Integer                   ' Anzahl der markierten Dateien (multiPfade)
+
+strSelectedPaths = FileChooser1.SelectedPaths  ' multiPfade + vollständiger Dateiname
+
+
+  ' Funktionslogik pro Datei
+  For intDateien = 0 To strSelectedPaths.Length - 1
+     ' nur den Dateinamen:
+     ' strSelectedPath = Mid$(strSelectedPaths[intDateien], RInStr(strSelectedPaths[intDateien], "/") + 1)
+     ' kompletten Pfad mit Dateinamen:
+       strSelectedPath = strSelectedPaths[intDateien]
+  Next
+
+
+strSelectedDateiExt = LCase$(Mid$(strSelectedPath, RInStr(strSelectedPath, ".") + 1))   ' Endung, Großtext in Kleintext (LCase)
+
+
+  ' wenn das Bild kleiner als 200 Pixel ist > Bild nicht öffnen
+  If intDateiGroesse > 0 Then
+   Try Shell "identify -format %w '" & strSelectedPath & "'" Wait To strPicExifW
+   Try Shell "identify -format %h '" & strSelectedPath & "'" Wait To strPicExifH
+  Endif
+
+  'integer/string Problem seit Gambas3! Daher:
+  intPicExifW = CInt(Val(strPicExifW))
+  intPicExifH = CInt(Val(strPicExifH))
+
+
+  If strSelectedDateiExt = "jpg" Or strSelectedDateiExt = "jpeg" Or strSelectedDateiExt = "jpe" Or strSelectedDateiExt = "bmp" Or strSelectedDateiExt = "png" Or strSelectedDateiExt = "gif" Or strSelectedDateiExt = "pcx" Or strSelectedDateiExt = "tif" Or strSelectedDateiExt = "tiff" Or strSelectedDateiExt = "xcf" And intPicExifW < 200 And intPicExifH < 200 Then
+      Message.Info("Sorry, das Bild ist zu klein zum öffnen." & Chr(10) & "Eine Großansicht ist erst ab 200 Pixel möglich.", " OK ")
+    Return
+  Endif
+
+
+    ' Hilfe zum Display
+      If bolDisplayHelp = True Then frmHelpDisplay.Show()
+
+    ' Bild mit ImageMagick anzeigen (Bild entsprechend der EXIF Orientation)
+      strDisplayShell = "display -auto-orient -geometry 800x600 " & "'" & strSelectedPath & "'"
+      Try Shell strDisplayShell ' kein WAIT
+
+
+End
+
+Public Sub TabStrip1_Click()
+
+  Select Case TabStrip1.Index
+    Case 0
+     lblTABInfo.Text = "Info: Mehrfachmarkierung ist mit der 'Strg'-Taste möglich. PDFs werden zu JPG-Bilder."
+    Case 1
+     lblTABInfo.Text = "Tipp: Internet 600-1024 Pixel (Kompr. 70%)   |   eMail 800-1920 Pixel (Kompr. 85%)"
+     If cbxPicResize.Text = "" Then cbxPicResize.Text = "0"
+    Case 2
+     lblTABInfo.Text = "Ohne ImageMagick und libjpeg-progs kann das Programm nicht funktionieren!"
+  End Select
+
+End
+
+Public Sub btnChangePicAll_Click()
+Dim strPIConvertShell As String ' Shellbefehlsstring
+Dim intIndex, intCountStart As Integer
+Dim strInput, strCountStart As String
+
+TabStrip1.Index = 0 ' springe zu TAB 0
+
+
+  If intDateiGroesse = 0 Then Return
+  intIndex = Message.Question("Bei vielen Bilder kann dieses sehr zeitintensiv sein!", "OK", "Abrechen")
+
+  If intIndex = 1 Then
+   strInput = InputBox("Bilder werden automatisch nummeriert und gleiche Dateinamen werden überschrieben. Name:", "Bildername?", "Beispiel-2012")
+   strCountStart = InputBox("Automatische Bildnummerierung startet bei:", "Zahl?", "1")
+   If Not IsNumber(strCountStart) Then strCountStart = 1
+   intCountStart = CInt(Val(strCountStart))
+
+   If Len(strInput) < 1 Then Return ' Bildername mind. 1 Zeichen, sonst Ende
+
+   FileChooser1.SetFocus
+   Inc Application.Busy
+
+
+  ' Bild umwandeln (-scene 1 mit %03d -> Bildnummer fängt bei 001 an)
+  ' e.g.:convert -scene 1 '/home/name/Bilder/*.jpg' -resize 150x150 -quality 75 '/home/name/Bilder/Beispiel-2009_klein_%03d.jpg'
+  '
+  ' --------------- Umwandeln Start --------------------
+
+      ' alle Exif-Infos entfernen (-strip)
+      If bolExif = True Then
+
+
+If intResize = 0 Then ' Bildgröße bleibt (also kein -resize)
+     strPIConvertShell = "convert -strip -auto-orient -scene " & intCountStart & " '" & strSelectedLeseDir & "/*.jpg' '" & strSelectedLeseDir & "/*.JPG' '" & strSelectedLeseDir & "/*.jpeg' '" & strSelectedLeseDir & "/*.JPEG' -quality " & frmStart.intQuality & " -raise " & intFrame & "x" & intFrame & " '" & strSelectedLeseDir & "/" & strInput & "_%03d.jpg" "'"
+     Try Shell strPIConvertShell Wait
+Else ' Bild umwandeln (-resize)
+     strPIConvertShell = "convert -strip -auto-orient -scene " & intCountStart & " '" & strSelectedLeseDir & "/*.jpg' '" & strSelectedLeseDir & "/*.JPG' '" & strSelectedLeseDir & "/*.jpeg' '" & strSelectedLeseDir & "/*.JPEG' -resize " & frmStart.intResize & "x" & frmStart.intResize & "'>'" & " -raise " & intFrame & "x" & intFrame & " " & "-quality " & frmStart.intQuality & " '" & strSelectedLeseDir & "/" & strInput & "_%03d.jpg" "'"
+     Try Shell strPIConvertShell Wait
+Endif ' intResize
+
+
+      Else ' alle Exif-Infos bleiben
+
+
+If intResize = 0 Then ' Bildgröße bleibt (also kein -resize)
+     strPIConvertShell = "convert -auto-orient -scene " & intCountStart & " '" & strSelectedLeseDir & "/*.jpg' '" & strSelectedLeseDir & "/*.JPG' '" & strSelectedLeseDir & "/*.jpeg' '" & strSelectedLeseDir & "/*.JPEG' -quality " & frmStart.intQuality & " -raise " & intFrame & "x" & intFrame & " '" & strSelectedLeseDir & "/" & strInput & "_%03d.jpg" "'"
+     Try Shell strPIConvertShell Wait
+Else ' Bild umwandeln (-resize)
+     strPIConvertShell = "convert -auto-orient -scene " & intCountStart & " '" & strSelectedLeseDir & "/*.jpg' '" & strSelectedLeseDir & "/*.JPG' '" & strSelectedLeseDir & "/*.jpeg' '" & strSelectedLeseDir & "/*.JPEG' -resize " & frmStart.intResize & "x" & frmStart.intResize & "'>'" & " -raise " & intFrame & "x" & intFrame & " " & "-quality " & frmStart.intQuality & " '" & strSelectedLeseDir & "/" & strInput & "_%03d.jpg" "'"
+     Try Shell strPIConvertShell Wait
+Endif ' intResize
+
+
+      Endif ' IF bolExif
+
+
+  Endif ' IF intIndex
+
+
+  ' --------------- Umwandeln Ende --------------------
+
+     ' FileChooser1.Refresh  -> funktioniert nicht da dieses für GUI und Reload nicht gibt.
+     ' darum:
+     FileChooser1.ShowDetailed = False
+     FileChooser1.ShowDetailed = True
+
+     Dec Application.Busy
+
+End
+
+
+Public Sub btnPicInfo_Click()             ' ImageMagick: exif-Daten auslesen wenn vorhanden
+Dim strPicInfo, strFormat As String       ' exif Dateiinfos, exif-Format
+  Inc Application.Busy
+  strFormat = "%m Dateiinfos (%n): \n Datei: %d/%f \n Pixel: %wx%h \n %x \n Software: %[EXIF:Software] \n Bilddatum(digitalisiert): %[EXIF:DateTimeDigitized] \n Kamera: %[EXIF:Model] \n Bildorientierung: %[EXIF:Orientation] \n"
+  If intDateiGroesse > 0 Then Try Shell "identify -format '" & strFormat & "' '" & strSelectedPath & "'" Wait To strPicInfo
+  Dec Application.Busy
+  Message.Info(strPicInfo)
+    'EXIF:Orientation:
+    '1. TopLeft
+    '2. TopRight
+    '3. BottomRight
+    '4. BottomLeft
+    '5. LeftTop
+    '6. RightTop
+    '7. RightBottom
+    '9. LeftBottom
+
+End
+
+Public Sub radPicFormat0_Click()
+bolJPGFormat = False ' radioButton Bildformat bleibt
+End
+
+Public Sub radPicFormat1_Click()
+bolJPGFormat = True ' radioButton Bild wird zu JPG
+End
+
+
+
+Public Sub btnRotateRight_Click()
+Dim strPIConvertShell As String                    ' Shellbefehlsstring
+Dim intDateien As Integer                          ' Anzahl der markierten Dateien (multiPfade)
+
+strSelectedPaths = FileChooser1.SelectedPaths      ' multiPfade + vollständiger Dateiname
+
+  Inc Application.Busy
+
+  ' Funktionslogik pro Datei
+  For intDateien = 0 To strSelectedPaths.Length - 1
+     ' nur den Dateinamen:
+     ' strSelectedPath = Mid$(strSelectedPaths[intDateien], RInStr(strSelectedPaths[intDateien], "/") + 1)
+     ' kompletten Pfad mit Dateinamen:
+       strSelectedPath = strSelectedPaths[intDateien]
+
+strSelectedDateiOhneExt = Left$(strSelectedPath, RInStr(strSelectedPath, ".") - 1)       ' Pfad + Dateiname ohne Endung
+strSelectedDateiExt = LCase$(Mid$(strSelectedPath, RInStr(strSelectedPath, ".") + 1))    ' Endung, Großtext in Kleintext (LCase)
+
+
+  ' Bild rechts drehen
+  ' e.g.: mogrify -rotate 90 '/home/name/Bilder/bildname.jpg'
+  '
+  ' --------------- Umwandeln Start --------------------
+    'strPIConvertShell = "mogrify -rotate 90 -quality 100 " & " '" & strSelectedPath & "'"
+
+   ' Verlustfreies drehen!
+   'jpegtran -rotate 90 a.jpg > a1.jpg
+       strPIConvertShell = "jpegtran -rotate 90 -copy all " & "'" & strSelectedPath & "' > '" & strSelectedDateiOhneExt & "_gedreht_.jpg'"
+       Try Shell strPIConvertShell Wait
+
+      ' wenn Dateigröße 0 dann ist libjpeg-progs nicht installiert
+      If Round(Stat(strSelectedDateiOhneExt & "_gedreht_.jpg").Size / 1.024) > 100 Then ' Dateigröße mehr als 100 Bytes
+        ' Umbenennen
+        Try Shell "mv -f '" & strSelectedDateiOhneExt & "_gedreht_.jpg'" & " '" & strSelectedPath & "'" Wait
+
+        Else
+
+        Kill strSelectedDateiOhneExt & "_gedreht_.jpg" ' 0 Byte Datei löschen
+
+        Message.Warning(("Fehler libjpeg-progs!" & Chr(10) & "libjpeg-progs muß installiert sein um Bilder verlustfrei zu drehen!") & Chr(10) &
+        ("z.B. per Terminal:") & Chr(10) & "sudo apt-get install libjpeg-progs" & Chr(10) & Chr(10) &
+        "Versuche das Tools nun automatisch zu installieren." & Chr(10) &
+        "Dafür wird eine Internetverbindung und das Root-Passwort benötigt!", (" OK "))
+
+        strCommand = "apt-get install libjpeg-progs"
+        Try Shell "gksudo " & strCommand Wait    ' wenn GNOME
+        Try Shell "kdesudo " & strCommand Wait   ' wenn KDE
+
+      Endif ' Ende Round(Stat...
+
+  Next ' intDateien
+
+  ' --------------- Umwandeln Ende --------------------
+
+     ' aktuelle Datei markieren (funzt in Multimode nicht)
+     '
+     'das funzt seit Gambas 3.5 nicht mehr! Darum: FileChooser1_Change()
+     'FileChooser1.Multi = False
+     'FileChooser1.SelectedPath = strSelectedPath
+     'FileChooser1.Multi = True
+     Dec Application.Busy
+     FileChooser1_Change()
+End
+
+
+
+Public Sub btnRotateLeft_Click()
+Dim strPIConvertShell As String                    ' Shellbefehlsstring
+Dim intDateien As Integer                          ' Anzahl der markierten Dateien (multiPfade)
+
+strSelectedPaths = FileChooser1.SelectedPaths      ' multiPfade + vollständiger Dateiname
+
+  Inc Application.Busy
+
+  ' Funktionslogik pro Datei
+  For intDateien = 0 To strSelectedPaths.Length - 1
+     ' nur den Dateinamen:
+     ' strSelectedPath = Mid$(strSelectedPaths[intDateien], RInStr(strSelectedPaths[intDateien], "/") + 1)
+     ' kompletten Pfad mit Dateinamen:
+       strSelectedPath = strSelectedPaths[intDateien]
+
+strSelectedDateiOhneExt = Left$(strSelectedPath, RInStr(strSelectedPath, ".") - 1)       ' Pfad + Dateiname ohne Endung
+strSelectedDateiExt = LCase$(Mid$(strSelectedPath, RInStr(strSelectedPath, ".") + 1))    ' Endung, Großtext in Kleintext (LCase)
+
+
+  ' Bild links drehen
+  ' e.g.: mogrify -rotate -90 '/home/name/Bilder/bildname.jpg'
+  '
+  ' --------------- Umwandeln Start --------------------
+    'strPIConvertShell = "mogrify -rotate -90 -quality 100 " & " '" & strSelectedPath & "'"
+
+   ' Verlustfreies drehen!
+   'jpegtran -rotate links a.jpg > a1.jpg
+       strPIConvertShell = "jpegtran -rotate 270 -copy all " & "'" & strSelectedPath & "' > '" & strSelectedDateiOhneExt & "_gedreht_.jpg'"
+       Try Shell strPIConvertShell Wait
+
+      ' wenn Dateigröße 0 dann ist libjpeg-progs nicht installiert
+      If Round(Stat(strSelectedDateiOhneExt & "_gedreht_.jpg").Size / 1.024) > 100 Then ' Dateigröße mehr als 100 Bytes
+        ' Umbenennen
+        Try Shell "mv -f '" & strSelectedDateiOhneExt & "_gedreht_.jpg'" & " '" & strSelectedPath & "'" Wait
+
+        Else
+
+        Kill strSelectedDateiOhneExt & "_gedreht_.jpg" ' 0 Byte Datei löschen
+
+        Message.Warning(("Fehler libjpeg-progs!" & Chr(10) & "libjpeg-progs muß installiert sein um Bilder verlustfrei zu drehen!") & Chr(10) &
+        ("z.B. per Terminal:") & Chr(10) & "sudo apt-get install libjpeg-progs" & Chr(10) & Chr(10) &
+        "Versuche das Tools nun automatisch zu installieren." & Chr(10) &
+        "Dafür wird eine Internetverbindung und das Root-Passwort benötigt!", (" OK "))
+
+        strCommand = "`apt-get install libjpeg-progs`"
+
+        Try Shell "gksudo " & strCommand Wait    ' wenn GNOME
+        Try Shell "kdesudo " & strCommand Wait   ' wenn KDE
+
+      Endif ' Ende Round(Stat..
+
+  Next ' intDateien
+
+  ' --------------- Umwandeln Ende --------------------
+
+     ' aktuelle Datei markieren (funzt in Multimode nicht)
+     '
+     'das funzt seit Gambas 3.5 nicht mehr! Darum: FileChooser1_Change()
+     'FileChooser1.Multi = False
+     'FileChooser1.SelectedPath = strSelectedPath
+     'FileChooser1.Multi = True
+     Dec Application.Busy
+     FileChooser1_Change()
+End

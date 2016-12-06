@@ -1,0 +1,17 @@
+# Gambas Form File 3.0
+{ Form Form 
+  MoveScaled(0,0,110,41)
+  Text = ("Bild")
+  Resizable = False
+  FullScreen = True
+  { ScrollView1 ScrollView 
+    MoveScaled(1,1,108,39)
+    { picBigPicture PictureBox 
+      MoveScaled(0,0,108.5714,40)
+      Mouse = Mouse.Cross
+      ToolTip = ("Zum Beenden in hier rein klicken")
+      Alignment = Align.Center
+      Border = Border.Sunken
+    }
+  }
+}

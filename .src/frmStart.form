@@ -1,0 +1,256 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,115,89)
+  Text = ("kleinBild3 - GUI")
+  Icon = Picture["camera-photo16.png"]
+  Resizable = False
+  { TabStrip1 TabStrip
+    MoveScaled(0,1,115,82)
+    Count = 3
+    Index = 0
+    Text = ("Bilder")
+    Picture = Picture["camera-photo16.png"]
+    { FileChooser1 FileChooser
+      MoveScaled(0,1,113,62)
+    }
+    { btnChangePic Button
+      MoveScaled(2,64,21.5,4)
+      Mouse = Mouse.Pointing
+      ToolTip = ("markierte Bilder verkleinern")
+      Text = ("&Bild verkleinern")
+      Picture = Picture["emblem-photos.png"]
+    }
+    { btnDeleteFile Button
+      MoveScaled(26,64,21.5,4)
+      Mouse = Mouse.Pointing
+      ToolTip = ("markierte unwiderruflich löschen!")
+      Text = ("&Datei löschen (F4)")
+      Picture = Picture["gtk-undelete-rtl.png"]
+    }
+    { cbxDbkClick CheckBox
+      MoveScaled(2,69,36,4)
+      Text = ("Einzelbild verkleinern mit Doppelklick")
+    }
+    { cbxPDF CheckBox
+      MoveScaled(2,72,24,4)
+      ToolTip = ("beim verkleinern wird das Bild\nin eine PDF-Datei umgewandelt")
+      Text = ("Bild in PDF umwandeln")
+    }
+    { picVorschauBox PictureBox
+      MoveScaled(87,63,22,13)
+      Mouse = Mouse.Pointing
+      ToolTip = ("Datei öffnen...")
+      Alignment = Align.Center
+      Border = Border.Sunken
+    }
+    { lblDateiGroesse Label
+      MoveScaled(51,64,35,3)
+      Font = Font["-1"]
+      ToolTip = ("Dateigröße")
+      Text = ("DateiGroesse")
+      Alignment = Align.Right
+    }
+    { lblPixel Label
+      MoveScaled(48,68,38,3)
+      Font = Font["-1"]
+      ToolTip = ("exif Pixeldaten")
+      Text = ("Pixel")
+      Alignment = Align.TopRight
+    }
+    { lblDateiOrt Label
+      MoveScaled(40,71,46,3)
+      Font = Font["-1"]
+      ToolTip = ("Ort und Name")
+      Text = ("DateiOrt")
+      Alignment = Align.Right
+    }
+    { btnRotateLeft ToolButton
+      MoveScaled(109,63,4,4)
+      ToolTip = ("Bild links drehen")
+      Picture = Picture["object-rotate-left.png"]
+    }
+    { btnPicInfo ToolButton
+      MoveScaled(109,67,4,4)
+      Font = Font["Bold"]
+      ToolTip = ("mehr Dateiinfos")
+      Picture = Picture["tomboy-tag.png"]
+    }
+    { btnRotateRight ToolButton
+      MoveScaled(109,71,4,4)
+      ToolTip = ("Bild rechts drehen")
+      Picture = Picture["object-rotate-right.png"]
+    }
+    { picPDF PictureBox
+      MoveScaled(26,72,3.5,3.5)
+      Picture = Picture["application-pdf.png"]
+      Alignment = Align.Center
+    }
+    Index = 1
+    Text = ("Einstellungen")
+    Picture = Picture["preferences-desktop.png"]
+    { fraBildqualitaet Frame
+      MoveScaled(6,5,60,30)
+      Text = ("Bildqualität")
+      { Label1 Label
+        MoveScaled(4,8,26,4)
+        Text = ("max. Pixelgröße")
+      }
+      { cbxPicResize ComboBox
+        MoveScaled(36,8,14,4)
+        ToolTip = ("Das Seitenverhältnis bleibt dabei gleich")
+        MaxLength = 4
+      }
+      { Label2 Label
+        MoveScaled(4,18,21,4)
+        Text = ("Komprimierung in %")
+      }
+      { cbxPicQuality ComboBox
+        MoveScaled(36,18,14,4)
+        ToolTip = ("jpg-Komprimierung")
+        ReadOnly = True
+        Text = ("jpg-Komprimierung")
+      }
+      { Label5 Label
+        MoveScaled(4,12,31,3)
+        Font = Font["Italic,-2"]
+        Text = ("0 = Bildgröße bleibt unverändert")
+      }
+      { Label7 Label
+        MoveScaled(4,22,19,3)
+        Font = Font["Italic,-2"]
+        Text = ("nur bei JPG!")
+      }
+      { Label13 Label
+        MoveScaled(36,12,20,3)
+        Font = Font["Italic,-2"]
+        Text = ("auswählen oder eintippen")
+      }
+    }
+    { fraSonstiges Frame
+      MoveScaled(6,37,60,26)
+      Text = ("Sonstiges")
+      { Label3 Label
+        MoveScaled(4,6,28,4)
+        Text = ("Dateianhang für kleine Bilder *")
+      }
+      { txtSmall TextBox
+        MoveScaled(33,6,20,4)
+        Text = ("txtSmall")
+        MaxLength = 20
+      }
+      { Label4 Label
+        MoveScaled(33,10,19,3)
+        Font = Font["Italic,-1"]
+        Text = ("mind. 1 Zeichen!")
+      }
+      { cbxDisplayHelp CheckBox
+        MoveScaled(4,18,51,4)
+        ToolTip = ("nur wenn das Bild geöffnet wird")
+        Text = ("Hilfe Tastaturkürzel ImageMagick anzeigen")
+      }
+      { cbxExif CheckBox
+        MoveScaled(4,14,51,4)
+        ToolTip = ("Exif-Infos sind z.B. Datum, Kameratyp usw.")
+        Text = ("alle Exif-Infos aus JPG-Bilder entfernen")
+      }
+    }
+    { fraPicFormat Frame
+      MoveScaled(70,5,39,30)
+      Text = ("Bildformat *")
+      { Label9 Label
+        MoveScaled(2,4,35,8)
+        Text = ("Alle nicht JPG-Bilder können\nin das JPG-Format umgewandelt\nwerden. Z.B. aus PNG wird dann JPG.")
+      }
+      { Label11 Label
+        MoveScaled(2,12,33,4)
+        Font = Font["Italic,-2"]
+        Text = ("(PDF wird immer nach JPG extrahiert)")
+      }
+      { radPicFormat0 RadioButton
+        MoveScaled(4,17,29,4)
+        Text = ("Format bleibt (Standard)")
+      }
+      { radPicFormat1 RadioButton
+        MoveScaled(4,22,29,4)
+        Text = ("alles wird zu JPG")
+      }
+    }
+    { Label6 Label
+      MoveScaled(2,69,109,4)
+      Font = Font["+1"]
+      Text = ("Info: Einstellungen werden beim Beenden gespeichert")
+      Alignment = Align.Center
+    }
+    { Label8 Label
+      MoveScaled(77,59,31,3)
+      Font = Font["Italic,-2"]
+      Text = ("* nur bei Einzelbilder-Verkleinerung")
+      Alignment = Align.Right
+    }
+    { fraRahmen Frame
+      MoveScaled(70,37,39,17)
+      Text = ("Bildrahmen")
+      { Label10 Label
+        MoveScaled(2,7,21,4)
+        Text = ("Rahmengröße in Pixel")
+      }
+      { Label12 Label
+        MoveScaled(2,10,31,3)
+        Font = Font["Italic,-2"]
+        Text = ("0 = ohne Rahmen (Standard)")
+      }
+      { cbxFrame ComboBox
+        MoveScaled(27,7,10,4)
+        ToolTip = ("Rahmen")
+        ReadOnly = True
+        Text = ("Rahmen")
+      }
+    }
+    Index = 2
+    Text = ("Info")
+    Picture = Picture["dialog-information.png"]
+    { fraInfo Frame
+      MoveScaled(3,4,108,64)
+      Text = ("kleinBild3 - GUI für ImageMagick")
+      { lblVersion Label
+        MoveScaled(4,10,101,12)
+        Text = ("Label1")
+        Alignment = Align.TopNormal
+      }
+      { lblInfo Label
+        MoveScaled(4,25,101,35)
+        Text = ("Label5")
+        Alignment = Align.TopNormal
+      }
+    }
+    { lblHomepage Label
+      MoveScaled(59,70,51,4)
+      Font = Font["Italic,+2"]
+      Text = ("Homepage: www.JoLichter.de")
+      Alignment = Align.Right
+    }
+    Index = 0
+  }
+  { btnChangePicAll Button
+    MoveScaled(39,1,75,4)
+    Font = Font["-2"]
+    Mouse = Mouse.Pointing
+    ToolTip = ("Bei vielen Bilder kann dieses sehr zeitintensiv sein!")
+    Text = ("btnChangePicAll")
+    Picture = Picture["media-playback-start.png"]
+  }
+  { btnEnd Button
+    MoveScaled(1,84,21,4)
+    Font = Font["Bold"]
+    Mouse = Mouse.Pointing
+    Text = ("Beenden (&Esc)")
+    Picture = Picture["window-close.png"]
+  }
+  { lblTABInfo Label
+    MoveScaled(24,84,88,4)
+    Font = Font["+1"]
+    Text = ("lblTABInfo")
+    Alignment = Align.Right
+  }
+}

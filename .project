@@ -1,0 +1,26 @@
+# Gambas Project File 3.0
+# Compiled with Gambas 3.9.1
+Title=kleinBild3
+Startup=frmStart
+Icon=camera-photo32.png
+Version=16.12.28
+Component=gb.image
+Component=gb.qt4
+Component=gb.form
+Component=gb.settings
+Description="kleinBild3 - Qt4 GUI für ImageMagick"
+Authors="www.jolichter.de"
+TabSize=2
+Translate=1
+Language=de
+Maintainer=Jo Lichter
+Vendor=jolichterde
+Address=jlichter@web.de
+Url=http://www.jolichter.de
+License=Freeware
+PackageName=kleinbild3-16.12.28
+Packager=1
+Systems=autotools,debian
+Menus=debian:"Applications/Graphics"
+Categories=debian:"Graphics"
+Groups=debian:"graphics"

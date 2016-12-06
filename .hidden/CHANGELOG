@@ -1,0 +1,84 @@
+* Tue Dec 06 2016 Jo Lichter <jlichter@web.de> 16.12.28
+- update2: Color Management!
+- ImageMagick version 6.8.9-9  to working better with "sRGB" instead of "RGB"
+
+* Sat Jun 28 2014 Jo Lichter <jlichter@web.de> 14.6.26
+- update: Color Management!
+- Color Management has changed significantly between ImageMagick version 6.7.5-5 and 6.8.0-3 in order to better conform to color and grayscale standards.
+- e.g.: Use "-set colorspace RGB" instead of "-colorspace RGB" !
+
+* Wed Jun 11 2014 Jo Lichter <jlichter@web.de> 14.6.25
+- bug: Variable für Terminalbefehl in Backtick
+
+* Thu Nov 07 2013 Jo Lichter <jlichter@web.de> 13.11.24
+- bug: FileChooser an Gambas 3.5 angepasst
+
+* Sat Nov 02 2013 Jo Lichter <jlichter@web.de> 13.11.23
+- new: alle markierte Bilder drehen wenn multi markiert
+
+* Sun Aug 19 2012 Jo Lichter <jlichter@web.de> 12.8.22
+- new: Exif-Infos können entfernt werden
+
+* Fri Aug 17 2012 Jo Lichter <jlichter@web.de> 12.8.21
+- new: Angepasst für Gambas 3 und Qt4
+- new: Startnummer der automatischen Bildnummerierung wählbar
+
+* Sun Oct 23 2011 Jo Lichter <jlichter@web.de> 10.11.20
+- update: Debian6
+
+* Fri Nov 12 2010 Jo Lichter <info@lichter-it.de> 10.11.19
+- add: CMYK to RGB
+
+* Tue May 04 2010 Jo Lichter <info@lichter-it.de> 10.4.15
+- add: Bild in PDF umwandeln
+
+* Sun Jan 31 2010 Jo Lichter <jlichter@web.de> 10.1.14
+- chg: Kleinigkeiten ;-)
+
+* Sat Jan 16 2010 Jo Lichter <jlichter@web.de> 10.1.13
+- chg: bessere imagemagick Installation unter GNOME und KDE
+
+* Fri Jan 15 2010 Jo Lichter <jlichter@web.de> 10.1.12
+- new: Mehrfachmarkierung von Bilder mit 'Strg' möglich
+- chg: freie Pixelauswahl
+- chg: Bildnummer 001 bis (anstatt 000 bis)
+
+* Tue Jan 12 2010 Jo Lichter <jlichter@web.de> 10.1.11
+- new: Die Bildgröße wird nur geändert wenn die gewünschte Zielgröße tatsächlich kleiner ist
+- new: ImageMagick Display Hilfe
+
+* Sun Jan 10 2010 Jo Lichter <jlichter@web.de> 10.1.10
+- new: automatische EXIF-Bildorientierung
+
+* Sun Jan 10 2010 Jo Lichter <jlichter@web.de> 10.1.9
+- new: verlustfreies Drehen der Bilder
+- new: Bilderrahmen
+- chg: bessere DPI bei PDFs
+
+* Sat Jan 09 2010 Jo Lichter <jlichter@web.de> 10.1.8
+- bug: exif-Dateiinfos wurden nicht immer gelesen
+- new: alle nicht-jpg können in jpg umgewandel werden
+- new: drehen von jpg-Bilder
+- new: Vollansicht + Bildbearbeitung mit ImageMagick
+
+* Wed Jan 06 2010 Jo Lichter <jlichter@web.de> 10.1.7
+- chg: schnelleres Lesen von exif-Dateiinfos
+
+* Wed Jan 06 2010 Jo Lichter <jlichter@web.de> 10.1.6
+- add: mit der Entf. Taste eine Datei löschen
+
+* Wed Jan 06 2010 Jo Lichter <jlichter@web.de> 10.1.5
+- chg: Bessere ImageMagick Fehlermeldung
+
+* Tue Jan 05 2010 Jo Lichter <jlichter@web.de> 10.1.4
+- bug: in der Dateigröße wurden keine Kommastellen angezeigt
+
+* Mon Jan 04 2010 Jo Lichter <jlichter@web.de> 10.1.3
+- chg: Bessere exif Daten -> Geometry (Pixel)
+
+* Mon Jan 04 2010 Jo Lichter <jlichter@web.de> 10.1.2
+- add: alle JPG in einem Ordner mit nur 2 Klicks verkleinern und umbenennen
+- add: Bilder aus PDF erstellen
+
+* Sun Jan 03 2010 Jo Lichter <jlichter@web.de> 10.1.1
+- Initial release

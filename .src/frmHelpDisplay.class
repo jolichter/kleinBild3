@@ -1,0 +1,24 @@
+' Gambas class file
+
+
+PUBLIC SUB Form_Open()
+DIM picBild AS Picture        ' Tastaturkürzel Hilfe
+
+ ME.text = "Hilfe Tastaturkürzel ImageMagick"
+
+  TRY picBild = Picture.Load("tastatur_im.jpg")
+  TRY picBigPicture.Picture = picBild
+
+  'Picturebox so groß machen wie das Bild
+  TRY picBigPicture.Resize(picBild.Width, picBild.Height)
+
+END
+
+
+PUBLIC SUB picBigPicture_MouseDown()
+ME.close
+END
+
+PUBLIC SUB Form_KeyPress()
+IF Key.Code = Key["Esc"] THEN ME.Close
+END

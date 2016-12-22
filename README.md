@@ -1,6 +1,6 @@
 # kleinBild3
 ### Bilder mit nur einem Klick verkleinern für LINUX in Gambas3 entwickelt
-- hat eine Qt4-GUI
+- hat eine Qt5-GUI
 - schnelles verkleinern von Bilder mit einem Klick
 - Qualitätsstufen für die Bildkompression und Pixelgröße ist bei JPEG einstellbar
 - kann einen ganzen Ordner mit Bilder verkleinern und umbenennen

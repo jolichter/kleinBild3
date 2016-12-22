@@ -1,3 +1,6 @@
+* Thu Dec 22 2016 Jo Lichter <jlichter@web.de> 16.12.29
+- new: Qt5-Toolkit and small improvements
+
 * Tue Dec 06 2016 Jo Lichter <jlichter@web.de> 16.12.28
 - update2: Color Management!
 - ImageMagick version 6.8.9-9  to working better with "sRGB" instead of "RGB"

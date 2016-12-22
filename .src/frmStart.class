@@ -53,13 +53,13 @@ Dim i As Integer
     Try Shell "convert -version" Wait To strImageMagickVer
     If strImageMagickVer = "" Then
       Message.Warning(("Fehler ImageMagick!" & Chr(10) & "ImageMagick und libjpeg-progs muß installiert sein damit das Programm funktioniert!") & Chr(10) &
-      ("z.B. per Terminal:") & Chr(10) & "sudo apt-get install imagemagick libjpeg-progs" & Chr(10) & Chr(10) &
+      ("z.B. per Terminal:") & Chr(10) & "sudo apt install imagemagick libjpeg-progs" & Chr(10) & Chr(10) &
       "Versuche diese Tools nun automatisch zu installieren." & Chr(10) &
       "Dafür wird eine Internetverbindung und das Root-Passwort benötigt!", (" OK "))
 
-      'Clipboard.Copy("sudo apt-get install imagemagick libjpeg-progs")
+      'Clipboard.Copy("sudo apt install imagemagick libjpeg-progs")
       'TRY SHELL ("gnome-terminal")
-        strCommand = "apt-get install imagemagick libjpeg-progs"
+        strCommand = "apt install imagemagick libjpeg-progs"
         Try Shell "gksudo " & strCommand Wait    ' wenn GNOME
         Try Shell "kdesudo " & strCommand Wait   ' wenn KDE
     Endif
@@ -70,14 +70,13 @@ Dim i As Integer
 
  ' Info
 lblVersion.Text = "Version: kleinBild3 " & strVersion & Chr(10) & Chr(10) & strImageMagickVerShort
-lblInfo.Text = "Kleines GUI um Bilder mit dem Command Line Tool 'ImageMagick' schnell und einfach mit nur einem Klick" &
+lblInfo.Text = "Kleines Qt5-GUI um Bilder mit dem Command Line Tool 'ImageMagick' schnell und einfach mit nur einem Klick" &
 Chr(10) & "zu verkleinern und verlustfrei zu drehen (das Original und die exif-Daten bleiben dabei erhalten)." &
 Chr(10) & "Die Bildgröße wird nur geändert wenn die gewünschte Zielgröße tatsächlich kleiner ist." &
-Chr(10) & "Da der I.E. keine CMYK-Bilder anzeigen kann, werden diese nach RGB umgewandelt!" &
 Chr(10) & Chr(10) & "Mit kleinBild3 können exif-Daten entfernt werden und PDF-Dateien in Bilder umgewandelt werden (u.v.m)." &
 Chr(10) & "Bilder mit exif-Daten werden automatisch orientiert (automatische Drehung) und gespeichert." &
 Chr(10) & Chr(10) & "Falls 'ImageMagick' und 'libjpeg-progs' nicht installiert sind, einfach per Terminal (Konsole) installieren." &
-Chr(10) & "Befehl: sudo apt-get install imagemagick libjpeg-progs" & Chr(10) & Chr(10) &
+Chr(10) & "Befehl: sudo apt install imagemagick libjpeg-progs" & Chr(10) & Chr(10) &
 "Das Programm ist Freeware. Die Installation und Gebrauch geschieht auf eigene Gefahr!" &
 Chr(10) & Chr(10) & Chr(10) & "Aktuelle Updates gibt es auf meiner Homepage."
 
@@ -163,8 +162,7 @@ Public Sub Form_KeyPress()
   Select Case Key.Code
      Case Key.Escape
      Me.Close ' Beenden
-     ' Key.Delete funzt leider nur wenn die Form SetFocus ist, aber dann funzt der Cursor hoch+runter im FileChooser1 nicht mehr ;-(
-     Case Key.F4 And TabStrip1.Index = 0 And btnDeleteFile.Enabled = True
+     Case Key.Delete And TabStrip1.Index = 0 And btnDeleteFile.Enabled = True
      btnDeleteFile_Click() ' Delete File
   End Select
 
@@ -707,11 +705,11 @@ strSelectedDateiExt = LCase$(Mid$(strSelectedPath, RInStr(strSelectedPath, ".") 
         Kill strSelectedDateiOhneExt & "_gedreht_.jpg" ' 0 Byte Datei löschen
 
         Message.Warning(("Fehler libjpeg-progs!" & Chr(10) & "libjpeg-progs muß installiert sein um Bilder verlustfrei zu drehen!") & Chr(10) &
-        ("z.B. per Terminal:") & Chr(10) & "sudo apt-get install libjpeg-progs" & Chr(10) & Chr(10) &
+        ("z.B. per Terminal:") & Chr(10) & "sudo apt install libjpeg-progs" & Chr(10) & Chr(10) &
         "Versuche das Tools nun automatisch zu installieren." & Chr(10) &
         "Dafür wird eine Internetverbindung und das Root-Passwort benötigt!", (" OK "))
 
-        strCommand = "apt-get install libjpeg-progs"
+        strCommand = "apt install libjpeg-progs"
         Try Shell "gksudo " & strCommand Wait    ' wenn GNOME
         Try Shell "kdesudo " & strCommand Wait   ' wenn KDE
 
@@ -773,11 +771,11 @@ strSelectedDateiExt = LCase$(Mid$(strSelectedPath, RInStr(strSelectedPath, ".") 
         Kill strSelectedDateiOhneExt & "_gedreht_.jpg" ' 0 Byte Datei löschen
 
         Message.Warning(("Fehler libjpeg-progs!" & Chr(10) & "libjpeg-progs muß installiert sein um Bilder verlustfrei zu drehen!") & Chr(10) &
-        ("z.B. per Terminal:") & Chr(10) & "sudo apt-get install libjpeg-progs" & Chr(10) & Chr(10) &
+        ("z.B. per Terminal:") & Chr(10) & "sudo apt install libjpeg-progs" & Chr(10) & Chr(10) &
         "Versuche das Tools nun automatisch zu installieren." & Chr(10) &
         "Dafür wird eine Internetverbindung und das Root-Passwort benötigt!", (" OK "))
 
-        strCommand = "`apt-get install libjpeg-progs`"
+        strCommand = "`apt install libjpeg-progs`"
 
         Try Shell "gksudo " & strCommand Wait    ' wenn GNOME
         Try Shell "kdesudo " & strCommand Wait   ' wenn KDE

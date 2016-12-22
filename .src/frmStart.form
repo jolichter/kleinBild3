@@ -15,18 +15,18 @@
       MoveScaled(0,1,113,62)
     }
     { btnChangePic Button
-      MoveScaled(2,64,21.5,4)
+      MoveScaled(2,64,21.5714,4)
       Mouse = Mouse.Pointing
       ToolTip = ("markierte Bilder verkleinern")
-      Text = ("&Bild verkleinern")
+      Text = ("Bild verkleinern")
       Picture = Picture["emblem-photos.png"]
     }
     { btnDeleteFile Button
-      MoveScaled(26,64,21.5,4)
+      MoveScaled(24,64,23,4)
       Mouse = Mouse.Pointing
       ToolTip = ("markierte unwiderruflich löschen!")
-      Text = ("&Datei löschen (F4)")
-      Picture = Picture["gtk-undelete-rtl.png"]
+      Text = ("Datei löschen (Entf)")
+      Picture = Picture["image-missing.png"]
     }
     { cbxDbkClick CheckBox
       MoveScaled(2,69,36,4)
@@ -40,7 +40,7 @@
     { picVorschauBox PictureBox
       MoveScaled(87,63,22,13)
       Mouse = Mouse.Pointing
-      ToolTip = ("Datei öffnen...")
+      ToolTip = ("Datei öffnen") & "..."
       Alignment = Align.Center
       Border = Border.Sunken
     }
@@ -82,7 +82,7 @@
       Picture = Picture["object-rotate-right.png"]
     }
     { picPDF PictureBox
-      MoveScaled(26,72,3.5,3.5)
+      MoveScaled(26,72,3.5714,3.5714)
       Picture = Picture["application-pdf.png"]
       Alignment = Align.Center
     }
@@ -214,12 +214,12 @@
       MoveScaled(3,4,108,64)
       Text = ("kleinBild3 - GUI für ImageMagick")
       { lblVersion Label
-        MoveScaled(4,10,101,12)
+        MoveScaled(4,8,101,12)
         Text = ("Label1")
         Alignment = Align.TopNormal
       }
       { lblInfo Label
-        MoveScaled(4,25,101,35)
+        MoveScaled(4,23,101,37)
         Text = ("Label5")
         Alignment = Align.TopNormal
       }
@@ -233,7 +233,7 @@
     Index = 0
   }
   { btnChangePicAll Button
-    MoveScaled(39,1,75,4)
+    MoveScaled(42,1,72,4)
     Font = Font["-2"]
     Mouse = Mouse.Pointing
     ToolTip = ("Bei vielen Bilder kann dieses sehr zeitintensiv sein!")
@@ -244,7 +244,7 @@
     MoveScaled(1,84,21,4)
     Font = Font["Bold"]
     Mouse = Mouse.Pointing
-    Text = ("Beenden (&Esc)")
+    Text = ("Beenden (Esc)")
     Picture = Picture["window-close.png"]
   }
   { lblTABInfo Label

@@ -20,7 +20,7 @@ SearchString=True
 [OpenFile]
 Count=1
 Active=1
-File[1]=".hidden/CHANGELOG:0.0"
+File[1]=".src/frmStart.form"
 
 [Watches]
 Count=0

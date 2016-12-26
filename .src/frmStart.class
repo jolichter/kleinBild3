@@ -70,7 +70,7 @@ Dim i As Integer
 
  ' Info
 lblVersion.Text = "Version: kleinBild3 " & strVersion & Chr(10) & Chr(10) & strImageMagickVerShort
-lblInfo.Text = "Kleines Qt5-GUI um Bilder mit dem Command Line Tool 'ImageMagick' schnell und einfach mit nur einem Klick" &
+lblInfo.Text = "Kleines Qt4/Qt5-GUI um Bilder mit dem Command Line Tool 'ImageMagick' schnell und einfach mit nur einem Klick" &
 Chr(10) & "zu verkleinern und verlustfrei zu drehen (das Original und die exif-Daten bleiben dabei erhalten)." &
 Chr(10) & "Die Bildgröße wird nur geändert wenn die gewünschte Zielgröße tatsächlich kleiner ist." &
 Chr(10) & Chr(10) & "Mit kleinBild3 können exif-Daten entfernt werden und PDF-Dateien in Bilder umgewandelt werden (u.v.m)." &
@@ -235,8 +235,8 @@ strSelectedPaths = FileChooser1.SelectedPaths  ' multiPfade + vollständiger Dat
       Try intDateiGroesse = Round(Stat(strSelectedPath).Size / 1.024) ' Label Dateigröße
 
  ' Label Ordner + Dateiname
-      If Len(strSelectedPath) > 45 Then
-         lblDateiOrt.Text = "..." & Right$(strSelectedPath, 45)
+      If Len(strSelectedPath) > 66 Then
+         lblDateiOrt.Text = "..." & Right$(strSelectedPath, 66)
       Else
          lblDateiOrt.Text = strSelectedPath
       Endif
@@ -260,7 +260,7 @@ Else ' oder wenn eine Datei markiert ist
   strSelectedLeseDir = Left$(strSelectedPath, RInStr(strSelectedPath, "/") - 1)
   Settings["Einstellung/SelectedLeseDir"] = strSelectedLeseDir
 ' Vorschaubild zeigt ein Bild entsprechend der EXIF Orientation richtig an
-   strVorschauShell = "convert -auto-orient -thumbnail x75 '" & strSelectedPath & "' /tmp/kleinBild-thumbnail.png"
+   strVorschauShell = "convert -auto-orient -thumbnail x120 '" & strSelectedPath & "' /tmp/kleinBild-thumbnail.png"
     Try Shell strVorschauShell Wait
      Try picVorschaubild = Picture.Load("/tmp/kleinBild-thumbnail.png")
       picVorschauBox.Picture = picVorschaubild ' kein try notwendig
@@ -270,8 +270,8 @@ Endif
 
 
  ' Text für den btnChangePicAll Schalter
- If Len(strSelectedLeseDir) > 50 Then
-   btnChangePicAll.text = "&Alle JPG im Ordner '..." & Right$(strSelectedLeseDir, 50) & "' verkleinern"
+ If Len(strSelectedLeseDir) > 66 Then
+   btnChangePicAll.text = "&Alle JPG im Ordner '..." & Right$(strSelectedLeseDir, 66) & "' verkleinern"
  Else
    btnChangePicAll.text = "&Alle JPG im Ordner '" & strSelectedLeseDir & "' verkleinern"
  Endif
@@ -545,7 +545,7 @@ strSelectedDateiExt = LCase$(Mid$(strSelectedPath, RInStr(strSelectedPath, ".") 
       If bolDisplayHelp = True Then frmHelpDisplay.Show()
 
     ' Bild mit ImageMagick anzeigen (Bild entsprechend der EXIF Orientation)
-      strDisplayShell = "display -auto-orient -geometry 800x600 " & "'" & strSelectedPath & "'"
+      strDisplayShell = "display -auto-orient -geometry 960x720 " & "'" & strSelectedPath & "'"
       Try Shell strDisplayShell ' kein WAIT
 
 

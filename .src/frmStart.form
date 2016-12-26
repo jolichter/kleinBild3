@@ -1,88 +1,88 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,115,89)
+  MoveScaled(0,0,137.1429,102.8571)
   Text = ("kleinBild3 - GUI")
   Icon = Picture["camera-photo16.png"]
   Resizable = False
   { TabStrip1 TabStrip
-    MoveScaled(0,1,115,82)
+    MoveScaled(0,1,137,95)
     Count = 3
     Index = 0
     Text = ("Bilder")
     Picture = Picture["camera-photo16.png"]
     { FileChooser1 FileChooser
-      MoveScaled(0,1,113,62)
+      MoveScaled(0,1,136,74)
     }
     { btnChangePic Button
-      MoveScaled(2,64,21.5714,4)
+      MoveScaled(2,76,21.5714,4)
       Mouse = Mouse.Pointing
       ToolTip = ("markierte Bilder verkleinern")
       Text = ("Bild verkleinern")
       Picture = Picture["emblem-photos.png"]
     }
     { btnDeleteFile Button
-      MoveScaled(24,64,23,4)
+      MoveScaled(24,76,23,4)
       Mouse = Mouse.Pointing
       ToolTip = ("markierte unwiderruflich löschen!")
       Text = ("Datei löschen (Entf)")
       Picture = Picture["image-missing.png"]
     }
     { cbxDbkClick CheckBox
-      MoveScaled(2,69,36,4)
+      MoveScaled(2,81,36,4)
       Text = ("Einzelbild verkleinern mit Doppelklick")
     }
     { cbxPDF CheckBox
-      MoveScaled(2,72,24,4)
+      MoveScaled(2,85,24,4)
       ToolTip = ("beim verkleinern wird das Bild\nin eine PDF-Datei umgewandelt")
       Text = ("Bild in PDF umwandeln")
     }
     { picVorschauBox PictureBox
-      MoveScaled(87,63,22,13)
+      MoveScaled(109,75,22,14)
       Mouse = Mouse.Pointing
       ToolTip = ("Datei öffnen") & "..."
       Alignment = Align.Center
       Border = Border.Sunken
     }
     { lblDateiGroesse Label
-      MoveScaled(51,64,35,3)
+      MoveScaled(70,76,38,3)
       Font = Font["-1"]
       ToolTip = ("Dateigröße")
       Text = ("DateiGroesse")
       Alignment = Align.Right
     }
     { lblPixel Label
-      MoveScaled(48,68,38,3)
+      MoveScaled(70,80,38,3)
       Font = Font["-1"]
       ToolTip = ("exif Pixeldaten")
       Text = ("Pixel")
       Alignment = Align.TopRight
     }
     { lblDateiOrt Label
-      MoveScaled(40,71,46,3)
+      MoveScaled(37,84,71,3)
       Font = Font["-1"]
       ToolTip = ("Ort und Name")
       Text = ("DateiOrt")
       Alignment = Align.Right
     }
     { btnRotateLeft ToolButton
-      MoveScaled(109,63,4,4)
+      MoveScaled(131,75,4,4)
       ToolTip = ("Bild links drehen")
       Picture = Picture["object-rotate-left.png"]
     }
     { btnPicInfo ToolButton
-      MoveScaled(109,67,4,4)
+      MoveScaled(131,80,4,4)
       Font = Font["Bold"]
       ToolTip = ("mehr Dateiinfos")
       Picture = Picture["tomboy-tag.png"]
     }
     { btnRotateRight ToolButton
-      MoveScaled(109,71,4,4)
+      MoveScaled(131,85,4,4)
       ToolTip = ("Bild rechts drehen")
       Picture = Picture["object-rotate-right.png"]
     }
     { picPDF PictureBox
-      MoveScaled(26,72,3.5714,3.5714)
+      MoveScaled(26,85,3.5714,3.5714)
       Picture = Picture["application-pdf.png"]
       Alignment = Align.Center
     }
@@ -211,21 +211,21 @@
     Text = ("Info")
     Picture = Picture["dialog-information.png"]
     { fraInfo Frame
-      MoveScaled(3,4,108,64)
+      MoveScaled(3,4,128,74)
       Text = ("kleinBild3 - GUI für ImageMagick")
       { lblVersion Label
-        MoveScaled(4,8,101,12)
+        MoveScaled(4,8,119,12)
         Text = ("Label1")
         Alignment = Align.TopNormal
       }
       { lblInfo Label
-        MoveScaled(4,23,101,37)
+        MoveScaled(4,23,119,48)
         Text = ("Label5")
         Alignment = Align.TopNormal
       }
     }
     { lblHomepage Label
-      MoveScaled(59,70,51,4)
+      MoveScaled(78,82,51,4)
       Font = Font["Italic,+2"]
       Text = ("Homepage: www.JoLichter.de")
       Alignment = Align.Right
@@ -233,7 +233,7 @@
     Index = 0
   }
   { btnChangePicAll Button
-    MoveScaled(42,1,72,4)
+    MoveScaled(42,1,95,4)
     Font = Font["-2"]
     Mouse = Mouse.Pointing
     ToolTip = ("Bei vielen Bilder kann dieses sehr zeitintensiv sein!")
@@ -241,14 +241,14 @@
     Picture = Picture["media-playback-start.png"]
   }
   { btnEnd Button
-    MoveScaled(1,84,21,4)
+    MoveScaled(1,97,21,4)
     Font = Font["Bold"]
     Mouse = Mouse.Pointing
     Text = ("Beenden (Esc)")
     Picture = Picture["window-close.png"]
   }
   { lblTABInfo Label
-    MoveScaled(24,84,88,4)
+    MoveScaled(24,97,111,4)
     Font = Font["+1"]
     Text = ("lblTABInfo")
     Alignment = Align.Right

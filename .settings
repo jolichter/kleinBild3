@@ -18,7 +18,10 @@ SearchComment=False
 SearchString=True
 
 [OpenFile]
-Count=0
+Count=2
+File[1]=".src/frmStart.form"
+Active=2
+File[2]=".src/frmStart.class:27.75"
 
 [Watches]
 Count=0

@@ -227,7 +227,7 @@
     { lblHomepage Label
       MoveScaled(78,82,51,4)
       Font = Font["Italic,+2"]
-      Text = ("Homepage: www.JoLichter.de")
+      Text = ("Homepage: JoLichter.de")
       Alignment = Align.Right
     }
     Index = 0

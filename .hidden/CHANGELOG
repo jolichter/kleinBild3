@@ -1,3 +1,12 @@
+* Mon May 27 2019 Jo Lichter <jlichter@web.de> 19.5.33
+- update: convert HEIF (.heic, High Efficiency Image File Format) pictures to JPG
+
+* Sat Dec 22 2018 Jo Lichter <jlichter@web.de> 18.12.32
+- update Ubuntu Bionic, for security reasons disallowed (deprecated): sudo, kdesudo ...
+
+* Fri Dec 21 2018 Jo Lichter <jlichter@web.de> 18.12.31
+- update: Qt5
+
 * Mon Dec 26 2016 Jo Lichter <jlichter@web.de> 16.12.30
 - new: Qt4/Qt5-Toolkit and small improvements
 

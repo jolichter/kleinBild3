@@ -52,16 +52,14 @@ Dim i As Integer
     ' Prüfe ob ImageMagick installiert ist
     Try Shell "convert -version" Wait To strImageMagickVer
     If strImageMagickVer = "" Then
-      Message.Warning(("Fehler ImageMagick!" & Chr(10) & "ImageMagick und libjpeg-progs muß installiert sein damit das Programm funktioniert!") & Chr(10) &
-      ("z.B. per Terminal:") & Chr(10) & "sudo apt install imagemagick libjpeg-progs" & Chr(10) & Chr(10) &
-      "Versuche diese Tools nun automatisch zu installieren." & Chr(10) &
-      "Dafür wird eine Internetverbindung und das Root-Passwort benötigt!", (" OK "))
+      Message.Warning(("Fehler ImageMagick!" & Chr(10) & "ImageMagick, libjpeg-progs und libheif-examples muß installiert sein damit das Programm funktioniert.") & Chr(10) & Chr(10) &
+      "Terminal Befehl:" & Chr(10) & "sudo apt install imagemagick libjpeg-progs libheif-examples" & Chr(10) & Chr(10) & " ", (" OK "))
 
-      'Clipboard.Copy("sudo apt install imagemagick libjpeg-progs")
+      'Clipboard.Copy("sudo apt install imagemagick libjpeg-progs libheif-examples")
       'TRY SHELL ("gnome-terminal")
-        strCommand = "apt install imagemagick libjpeg-progs"
-        Try Shell "gksudo " & strCommand Wait    ' wenn GNOME
-        Try Shell "kdesudo " & strCommand Wait   ' wenn KDE
+        'strCommand = "sudo apt install imagemagick libjpeg-progs libheif-examples"
+        'Try Shell "gksudo " & strCommand Wait    ' wenn GNOME
+        'Try Shell "kdesudo " & strCommand Wait   ' wenn KDE
     Endif
 
  ' Versionen
@@ -70,13 +68,13 @@ Dim i As Integer
 
  ' Info
 lblVersion.Text = "Version: kleinBild3 " & strVersion & Chr(10) & Chr(10) & strImageMagickVerShort
-lblInfo.Text = "Kleines Qt4/Qt5-GUI um Bilder mit dem Command Line Tool 'ImageMagick' schnell und einfach mit nur einem Klick" &
+lblInfo.Text = "Kleines Qt5-GUI um Bilder mit dem Command Line Tool 'ImageMagick' schnell und einfach mit nur einem Klick" &
 Chr(10) & "zu verkleinern und verlustfrei zu drehen (das Original und die exif-Daten bleiben dabei erhalten)." &
 Chr(10) & "Die Bildgröße wird nur geändert wenn die gewünschte Zielgröße tatsächlich kleiner ist." &
 Chr(10) & Chr(10) & "Mit kleinBild3 können exif-Daten entfernt werden und PDF-Dateien in Bilder umgewandelt werden (u.v.m)." &
 Chr(10) & "Bilder mit exif-Daten werden automatisch orientiert (automatische Drehung) und gespeichert." &
-Chr(10) & Chr(10) & "Falls 'ImageMagick' und 'libjpeg-progs' nicht installiert sind, einfach per Terminal (Konsole) installieren." &
-Chr(10) & "Befehl: sudo apt install imagemagick libjpeg-progs" & Chr(10) & Chr(10) &
+Chr(10) & Chr(10) & "Falls 'ImageMagick', 'libjpeg-progs' und 'libheif-examples' nicht installiert sind, einfach per Terminal (Konsole) installieren." &
+Chr(10) & "Befehl: sudo apt install imagemagick libjpeg-progs libheif-examples" & Chr(10) & Chr(10) &
 "Das Programm ist Freeware. Die Installation und Gebrauch geschieht auf eigene Gefahr!" &
 Chr(10) & Chr(10) & Chr(10) & "Aktuelle Updates gibt es auf meiner Homepage."
 
@@ -145,7 +143,7 @@ Chr(10) & Chr(10) & Chr(10) & "Aktuelle Updates gibt es auf meiner Homepage."
 
  ' Dateimanager
 FileChooser1.Dir = strSelectedLeseDir
-FileChooser1.Filter = ["*.jpg;*.jpeg;*.pdf", "JPG & PDF files", "*.jpg;*.jpeg;*.png;*.gif;*.bmp", "Picture files", "*.jpg;*.jpeg", "JPG files", "*.pdf", "PDF files", "*.png", "PNG files", "*.gif", "GIF files", "*.bmp", "BMP files"]
+FileChooser1.Filter = ["*.jpg;*.jpeg;*.pdf", "JPG & PDF files", "*.jpg;*.jpeg;*.png;*.gif;*.bmp", "Picture files", "*.jpg;*.jpeg", "JPG files", "*.pdf", "PDF files", "*.png", "PNG files", "*.gif", "GIF files", "*.bmp", "BMP files", "*jpg;*.heic", "JPG & HEIF"]
 FileChooser1.ShowBookmark = False
 FileChooser1.Multi = True
 FileChooser1.ShowDetailed = True
@@ -337,7 +335,7 @@ End
 
 
 Public Sub btnChangePic_Click()
-Dim intDateien As Integer                         ' Anzahl der markierten Dateien (multiPfade)
+Dim intDateien, intIndex As Integer               ' Anzahl der markierten Dateien (multiPfade), intIndex für die Input Abfrage
 Dim strPIConvertShell As String                   ' Shellbefehlsstring
 
 Inc Application.Busy
@@ -356,12 +354,26 @@ strSelectedPaths = FileChooser1.SelectedPaths     ' multiPfade + vollständiger 
     strSelectedDateiExt = LCase$(Mid$(strSelectedPath, RInStr(strSelectedPath, ".") + 1))   ' Endung, Großtext in Kleintext (LCase)
 
 
+
+' neu ab V 19.5.33
+' HEIF Bilder konvertieren (.heic, High Efficiency Image File Format)
+' via Terminal e.g.: for file in *.heic; do heif-convert $file ${file/%.heic/.jpg};
+' need libheif-examples (sudo apt install libheif-examples)
+
+ If strSelectedDateiExt = "heic" Then
+   Dec Application.Busy
+   intIndex = Message.Question("HEIF-Bilder (.heic, High Efficiency Image File Format)" & Chr(10) & "müssen erst in JPG konvertiert werden." & Chr(10) & "Das Originabild bleibt erhalten und wird nicht verändert!", "OK", "Abrechen")
+   If intIndex = 1 Then
+       strPIConvertShell = "heif-convert '" & strSelectedPath & "' '" & strSelectedDateiOhneExt & ".jpg'"
+       Try Shell strPIConvertShell Wait
+   Endif
+ Endif
+
+
+
 ' --------------- Umwandeln Start --------------------
 
-
-
 If intResize = 0 Then ' Bildgröße bleibt (also kein -resize)
-
 
 If strSelectedDateiExt = "pdf" Then
    ' PDF in Bild umwandeln, Auflösung Standard 72dpi (das ist zu wenig, darum 200)
@@ -555,7 +567,7 @@ Public Sub TabStrip1_Click()
 
   Select Case TabStrip1.Index
     Case 0
-     lblTABInfo.Text = "Info: Mehrfachmarkierung ist mit der 'Strg'-Taste möglich. PDFs werden zu JPG-Bilder."
+     lblTABInfo.Text = "Tipps: Mehrfachmarkierung mit 'Strg' | Datei umbenennen mit F2 | PDFs werden zu JPG-Bilder"
     Case 1
      lblTABInfo.Text = "Tipp: Internet 600-1024 Pixel (Kompr. 70%)   |   eMail 800-1920 Pixel (Kompr. 85%)"
      If cbxPicResize.Text = "" Then cbxPicResize.Text = "0"
@@ -577,9 +589,12 @@ TabStrip1.Index = 0 ' springe zu TAB 0
   intIndex = Message.Question("Bei vielen Bilder kann dieses sehr zeitintensiv sein!", "OK", "Abrechen")
 
   If intIndex = 1 Then
-   strInput = InputBox("Bilder werden automatisch nummeriert und gleiche Dateinamen werden überschrieben. Name:", "Bildername?", "Beispiel-2012")
+   strInput = InputBox("Bilder werden automatisch nummeriert und gleiche Dateinamen werden überschrieben. Name:", "Bildername?", "Beispiel-2018")
+     If strInput = Null Then Return
+
    strCountStart = InputBox("Automatische Bildnummerierung startet bei:", "Zahl?", "1")
-   If Not IsNumber(strCountStart) Then strCountStart = 1
+     If strCountStart = Null Then Return
+     If Not IsNumber(strCountStart) Then strCountStart = 1
    intCountStart = CInt(Val(strCountStart))
 
    If Len(strInput) < 1 Then Return ' Bildername mind. 1 Zeichen, sonst Ende
@@ -589,7 +604,7 @@ TabStrip1.Index = 0 ' springe zu TAB 0
 
 
   ' Bild umwandeln (-scene 1 mit %03d -> Bildnummer fängt bei 001 an)
-  ' e.g.:convert -scene 1 '/home/name/Bilder/*.jpg' -resize 150x150 -quality 75 '/home/name/Bilder/Beispiel-2009_klein_%03d.jpg'
+  ' e.g.:convert -scene 1 '/home/name/Bilder/*.jpg' -resize 150x150 -quality 75 '/home/name/Bilder/Beispiel-2018_klein_%03d.jpg'
   '
   ' --------------- Umwandeln Start --------------------
 
@@ -703,15 +718,19 @@ strSelectedDateiExt = LCase$(Mid$(strSelectedPath, RInStr(strSelectedPath, ".") 
         Else
 
         Kill strSelectedDateiOhneExt & "_gedreht_.jpg" ' 0 Byte Datei löschen
+        
+        
+      Message.Warning(("Fehler libjpeg-progs!" & Chr(10) & "libjpeg-progs muß installiert sein um Bilder verlustfrei zu drehen!") & Chr(10) & Chr(10) &
+      "Terminal Befehl:" & Chr(10) & "sudo apt install libjpeg-progs" & Chr(10) & Chr(10) & " ", (" OK "))
 
-        Message.Warning(("Fehler libjpeg-progs!" & Chr(10) & "libjpeg-progs muß installiert sein um Bilder verlustfrei zu drehen!") & Chr(10) &
-        ("z.B. per Terminal:") & Chr(10) & "sudo apt install libjpeg-progs" & Chr(10) & Chr(10) &
-        "Versuche das Tools nun automatisch zu installieren." & Chr(10) &
-        "Dafür wird eine Internetverbindung und das Root-Passwort benötigt!", (" OK "))
+        'Message.Warning(("Fehler libjpeg-progs!" & Chr(10) & "libjpeg-progs muß installiert sein um Bilder verlustfrei zu drehen!") & Chr(10) &
+        '("z.B. per Terminal:") & Chr(10) & "sudo apt install libjpeg-progs" & Chr(10) & Chr(10) &
+        '"Versuche das Tools nun automatisch zu installieren." & Chr(10) &
+        '"Dafür wird eine Internetverbindung und das Root-Passwort benötigt!", (" OK "))
 
-        strCommand = "apt install libjpeg-progs"
-        Try Shell "gksudo " & strCommand Wait    ' wenn GNOME
-        Try Shell "kdesudo " & strCommand Wait   ' wenn KDE
+        'strCommand = "apt install libjpeg-progs"
+        'Try Shell "gksudo " & strCommand Wait    ' wenn GNOME
+        'Try Shell "kdesudo " & strCommand Wait   ' wenn KDE
 
       Endif ' Ende Round(Stat...
 

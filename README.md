@@ -7,4 +7,4 @@
 - Bilder verlustfrei drehen
 - das Original Bild bleibt erhalten
 - benötigt folgende Pakete (intstall): sudo apt install gambas3-runtime imagemagick libjpeg-progs libheif-examples
-- Info & Download als Debian-Paket: [jolichter.de -> kleinBild3] (https://jolichter.de/programme/kleinbild3.html)
+- Info & Download als Debian-Paket: [jolichter.de -> Tools -> kleinBild3] (https://jolichter.de/programme/kleinbild3.html)
